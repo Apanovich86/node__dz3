@@ -39,7 +39,7 @@ module.exports = {
 
             res.json(delUser);
         } catch (e) {
-            res.json(e);
+            res.json(e.message);
         }
     }
 };
