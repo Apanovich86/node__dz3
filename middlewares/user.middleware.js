@@ -1,15 +1,21 @@
 const User = require('../dataBase/User');
+const userValidator = require('../validators/user.validator');
+const {updateUserValidator} = require("../validators/user.validator");
+const {compare} = require('../service/password.service');
+
 
 module.exports = {
     checkLoginMiddleware: async (req, res, next) => {
         try {
             const {email, password} = req.body;
-            const user = await User.findOne({email, password});
-            if (!user) {
+
+            if (!email || !password) {
                 throw new Error('Email or password entered incorrectly');
             }
-
+            const user = await User.findOne({email, password});
             req.user = user;
+
+            await compare(password, user.password);
 
             next();
         } catch (e) {
@@ -27,6 +33,23 @@ module.exports = {
             if (req.body.password.length < 4 || req.body.password.length > 10) {
                 throw new Error('Password must be longer than 4 and less than 10 characters');
             }
+
+
+            next();
+        } catch (e) {
+            res.json(e.message);
+        }
+    },
+
+    isUserBodyValid: (req, res, next) => {
+        try {
+           const { error, value } = userValidator.createUserValidator.validate(req.body);
+
+           if (error) {
+               throw new Error(error.details[0].message);
+           }
+
+           req.body = value;
 
             next();
         } catch (e) {
@@ -50,5 +73,37 @@ module.exports = {
         } catch (e) {
             res.json(e.message);
         }
-    }
+    },
+
+    isUpdateUserValid: (req, res, next) => {
+        try {
+            const {error, value} = updateUserValidator.validate(req.body);
+
+            if (error) {
+                throw new Error(error.details[0].message);
+            }
+
+            req.body = value;
+
+            next();
+        } catch (e) {
+            res.json(e.message);
+        }
+    },
+
+    isAuthBodyValid: (req, res, next) => {
+        try {
+            const {error, value} = updateUserValidator.validate(req.body);
+
+            if (error) {
+                throw new Error(error.details[0].message);
+            }
+
+            req.body = value;
+
+            next();
+        } catch (e) {
+            res.json(e.message);
+        }
+    },
 };

@@ -24,6 +24,6 @@ const userSchema = new Schema({
         default: userRoles.USER,
         enum: Object.values(userRoles)
     }
-}, {tymestamps: true});
+}, {timestamps: true});
 
 module.exports = model('user', userSchema);

@@ -1,32 +1,51 @@
 const User = require('../dataBase/User');
+const passwordService = require('../service/password.service');
+const userUtil = require('../util/user.util');
 
 module.exports = {
     getUsers: async (req, res) => {
         try {
-            const users = await User.find();
+            const users = await User.find({}).lean();
 
-            res.json(users);
+            const normUsers = users.map(value => userUtil.userNormalizator(value));
+
+            res.json(normUsers);
         } catch (e) {
-            res.json(e);
+            res.json(e.message);
         }
     },
 
     getUserById: async (req, res) => {
-        try {
+        try{
             const {user_id} = req.params;
-            const user = await User.findById(user_id);
+            const user = await User.findById(user_id).lean();
 
-            res.json(user);
+            const normalizedUser = userUtil.userNormalizator(user);
+
+            res.json(normalizedUser);
         } catch (e) {
-            res.json(e);
+            res.json(e.message);
         }
     },
 
     createUser: async (req, res) => {
         try {
-            const newUser = await User.create(req.body);
+            const hashedPassword = await passwordService.hash(req.body.password);
+
+            const newUser = await User.create({...req.body, password: hashedPassword});
 
             res.json(newUser);
+        } catch (e) {
+            res.json(e.message);
+        }
+    },
+
+    updateUser: async (req, res) => {
+        try {
+            const { user_id } = req.params;
+            const updateUser = await User.findByIdAndUpdate(user_id, req.body);
+
+            res.json(updateUser);
         } catch (e) {
             res.json(e.message);
         }
