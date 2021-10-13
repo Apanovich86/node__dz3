@@ -2,7 +2,7 @@ const User = require('../dataBase/User');
 
 const {ErrorHandler, errors} = require('../errors');
 const {compare} = require('../service/password.service');
-const {authValidator, updateUserValidator, userValidator} = require('../validators');
+const {authValidator, userValidator} = require('../validators');
 
 
 module.exports = {
@@ -90,7 +90,7 @@ module.exports = {
 
     isUpdateUserValid: (req, res, next) => {
         try {
-            const {error, value} = updateUserValidator.validate(req.body);
+            const {error, value} = userValidator.updateUserValidator.validate(req.body);
 
             if (error) {
                 throw new Error(error.details[0].message);
