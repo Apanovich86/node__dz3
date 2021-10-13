@@ -1,8 +1,8 @@
 const User = require('../dataBase/User');
-const userValidator = require('../validators/user.validator');
-const {updateUserValidator} = require("../validators/user.validator");
+
+const {ErrorHandler, errors} = require('../errors');
 const {compare} = require('../service/password.service');
-const {authValidator} = require('../validators/auth.validator');
+const {authValidator, updateUserValidator, userValidator} = require('../validators');
 
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
 
             next();
         } catch (e) {
-            res.json(e.message);
+            next(e);
         }
     },
 
@@ -27,13 +27,16 @@ module.exports = {
             const {email, password} = req.body;
 
             const user = await User.findOne({email, password});
+            if (!user) {
+                throw new ErrorHandler(errors.NOT_FOUND_ERR.message, errors.NOT_FOUND_ERR.code);
+            }
             req.user = user;
 
             await compare(password, user.password);
 
             next();
         } catch (e) {
-            res.status(400).json(e.message);
+            next(e);
         }
     },
 
@@ -42,12 +45,12 @@ module.exports = {
             const userByEmail = await User.findOne({email: req.body.email});
 
             if (userByEmail) {
-                throw new Error('Email already exists');
+                throw new ErrorHandler(errors.RESOURCE_ALREADY_EXISTS.message, errors.RESOURCE_ALREADY_EXISTS.code);
             }
 
             next();
         } catch (e) {
-            res.json(e.message);
+            next(e);
         }
     },
 
@@ -63,7 +66,7 @@ module.exports = {
 
             next();
         } catch (e) {
-            res.json(e.message);
+            next(e);
         }
     },
 
@@ -74,14 +77,14 @@ module.exports = {
             const userById = await User.findById(user_id);
 
             if (!userById) {
-                throw new Error('Such user does not exist');
+               throw new ErrorHandler(errors.NOT_FOUND_ERR.message, errors.NOT_FOUND_ERR.code);
             }
 
             req.user = userById;
 
             next();
         } catch (e) {
-            res.json(e.message);
+            next(e);
         }
     },
 
@@ -97,7 +100,21 @@ module.exports = {
 
             next();
         } catch (e) {
-            res.json(e.message);
+            next(e);
+        }
+    },
+
+    checkUserRoles: (roleArr = []) => (req, res, next) => {
+        try {
+            const { role } = req.user;
+
+            if (!roleArr.includes(role)) {
+                throw new ErrorHandler(errors.FORBIDDEN_ERR.message, errors.FORBIDDEN_ERR.code);
+            }
+
+            next();
+        } catch (e) {
+            next(e);
         }
     },
 };
