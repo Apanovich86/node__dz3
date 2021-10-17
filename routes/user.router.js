@@ -9,6 +9,6 @@ router.post('/', userMiddleware.isUserBodyValid, userMiddleware.createUserMiddle
 
 router.get('/:user_id', userMiddleware.checkUserById, userController.getUserById);
 router.put('/:user_id', userMiddleware.isUpdateUserValid, userMiddleware.checkUserById, userController.updateUser);
-router.delete('/:user_id', userMiddleware.checkUserById,  userMiddleware.checkUserRoles([userRoles.ADMIN, userRoles.USER]), userController.deleteUser);
+router.delete('/:user_id', userMiddleware.checkUserById,  userMiddleware.checkUserRoles([userRoles.ADMIN, userRoles.MANAGER]), userController.deleteUser);
 
 module.exports = router;
