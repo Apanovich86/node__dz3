@@ -17,12 +17,11 @@ module.exports = {
 
     getUserById: async (req, res, next) => {
         try{
-            const {user_id} = req.params;
-            const user = await User.findById(user_id).lean();
+            const user = req.user;
 
-            const normalizedUser = userUtil.userNormalizator(user);
+            const normUsers = userUtil.userNormalizator(user);
 
-            res.json(normalizedUser);
+            res.json(normUsers);
         } catch (e) {
             next(e);
         }
@@ -34,7 +33,9 @@ module.exports = {
 
             const newUser = await User.create({...req.body, password: hashedPassword});
 
-            res.json(newUser);
+            const normUsers = userUtil.userNormalizator(newUser);
+
+            res.json(normUsers);
         } catch (e) {
             next(e);
         }
@@ -45,7 +46,9 @@ module.exports = {
             const { user_id } = req.params;
             const updateUser = await User.findByIdAndUpdate(user_id, req.body);
 
-            res.json(updateUser);
+            const normUsers = userUtil.userNormalizator(updateUser);
+
+            res.json(normUsers);
         } catch (e) {
             next(e);
         }
@@ -56,7 +59,9 @@ module.exports = {
             const {user_id} = req.params;
             const delUser = await User.findByIdAndDelete(user_id);
 
-            res.json(delUser);
+            const normUsers = userUtil.userNormalizator(delUser);
+
+            res.json(normUsers);
         } catch (e) {
             next(e);
         }

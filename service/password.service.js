@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 
-const ErrorHandler = require("../errors/ErrorHandler");
+const {ErrorHandler, errors} = require('../errors/ErrorHandler');
 
 module.exports = {
     hash: (password) => {
@@ -10,7 +10,7 @@ module.exports = {
         const isPasswordMatched = await bcrypt.compare(password, hashPassword);
 
         if (!isPasswordMatched) {
-            throw new ErrorHandler('Wrong email or password', 404);
+            throw new ErrorHandler(errors.NOT_FOUND_ERR.message, errors.NOT_FOUND_ERR.code);
         }
     }
 };

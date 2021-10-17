@@ -4,14 +4,13 @@ const {ErrorHandler, errors} = require('../errors');
 const {compare} = require('../service/password.service');
 const {authValidator, userValidator} = require('../validators');
 
-
 module.exports = {
     isAuthBodyValid: (req, res, next) => {
         try {
             const {error, value} = authValidator.validate(req.body);
 
             if (error) {
-                throw new Error(error.details[0].message);
+                throw new ErrorHandler(errors.RESOURCE_ALREADY_EXISTS.message, errors.RESOURCE_ALREADY_EXISTS.code);
             }
 
             req.body = value;
@@ -26,10 +25,12 @@ module.exports = {
         try {
             const {email, password} = req.body;
 
-            const user = await User.findOne({email, password});
+            const user = await User.findOne({email});
+
             if (!user) {
                 throw new ErrorHandler(errors.NOT_FOUND_ERR.message, errors.NOT_FOUND_ERR.code);
             }
+
             req.user = user;
 
             await compare(password, user.password);
@@ -59,7 +60,7 @@ module.exports = {
            const { error, value } = userValidator.createUserValidator.validate(req.body);
 
            if (error) {
-               throw new Error(error.details[0].message);
+               throw new ErrorHandler(errors.NOT_VALID_USER_BODY_ERR.message, errors.NOT_VALID_USER_BODY_ERR.code);
            }
 
            req.body = value;
@@ -74,7 +75,7 @@ module.exports = {
         try {
             const {user_id} = req.params;
 
-            const userById = await User.findById(user_id);
+            const userById = await User.findById(user_id).lean();
 
             if (!userById) {
                throw new ErrorHandler(errors.NOT_FOUND_ERR.message, errors.NOT_FOUND_ERR.code);
@@ -93,7 +94,7 @@ module.exports = {
             const {error, value} = userValidator.updateUserValidator.validate(req.body);
 
             if (error) {
-                throw new Error(error.details[0].message);
+                throw new ErrorHandler(error.details[0].message);
             }
 
             req.body = value;

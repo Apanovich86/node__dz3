@@ -6,7 +6,7 @@ module.exports = {
 
     RESOURCE_ALREADY_EXISTS: {
         message: 'Email already exists',
-        code: 404
+        code: 400
     },
 
     FORBIDDEN_ERR: {
