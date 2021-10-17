@@ -7,7 +7,7 @@ const {authValidator, userValidator} = require('../validators');
 module.exports = {
     isAuthBodyValid: (req, res, next) => {
         try {
-            const {error, value} = authValidator.validate(req.body);
+            const {error, value} = authValidator.authValidator.validate(req.body);
 
             if (error) {
                 throw new ErrorHandler(errors.NOT_VALID_BODY.message, errors.NOT_VALID_BODY.code);
@@ -57,13 +57,13 @@ module.exports = {
 
     isUserBodyValid: (req, res, next) => {
         try {
-           const { error, value } = userValidator.createUserValidator.validate(req.body);
+            const { error, value } = userValidator.createUserValidator.validate(req.body);
 
-           if (error) {
-               throw new ErrorHandler(errors.NOT_VALID_BODY.message, errors.NOT_VALID_BODY.code);
-           }
+            if (error) {
+                throw new ErrorHandler(errors.NOT_VALID_BODY.message, errors.NOT_VALID_BODY.code);
+            }
 
-           req.body = value;
+            req.body = value;
 
             next();
         } catch (e) {
@@ -78,7 +78,7 @@ module.exports = {
             const userById = await User.findById(user_id).lean();
 
             if (!userById) {
-               throw new ErrorHandler(errors.NOT_FOUND_USER_BY_ID.message, errors.NOT_FOUND_USER_BY_ID.code);
+                throw new ErrorHandler(errors.NOT_FOUND_USER_BY_ID.message, errors.NOT_FOUND_USER_BY_ID.code);
             }
 
             req.user = userById;

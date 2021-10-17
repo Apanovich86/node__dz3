@@ -1,7 +1,6 @@
-const User = require('../dataBase/User');
-
+// const User = require('../dataBase/User');
 module.exports = {
-    loginUser: async (req, res, next) => {
+    loginUser: (req, res, next) => {
         try {
             const {login} =req.body;
 

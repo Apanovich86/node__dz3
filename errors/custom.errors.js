@@ -24,8 +24,5 @@ module.exports = {
         code: 404
     },
 
-    INTERNAL_SERVER_ERROR: {
-        message: 'The server cannot process the request to the site you are on',
-        code: 500
-    }
-}
+    INTERNAL_SERVER_ERROR: 500
+};

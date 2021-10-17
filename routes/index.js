@@ -1,4 +1,4 @@
 module.exports = {
-    authValidator: require('./auth.router'),
-    userValidator: require('./user.router')
+    authRouter: require('./auth.router'),
+    userRouter: require('./user.router')
 };
