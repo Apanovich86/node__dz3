@@ -10,7 +10,7 @@ module.exports = {
             const {error, value} = authValidator.validate(req.body);
 
             if (error) {
-                throw new ErrorHandler(errors.RESOURCE_ALREADY_EXISTS.message, errors.RESOURCE_ALREADY_EXISTS.code);
+                throw new ErrorHandler(errors.NOT_VALID_BODY.message, errors.NOT_VALID_BODY.code);
             }
 
             req.body = value;
@@ -60,7 +60,7 @@ module.exports = {
            const { error, value } = userValidator.createUserValidator.validate(req.body);
 
            if (error) {
-               throw new ErrorHandler(errors.NOT_VALID_USER_BODY_ERR.message, errors.NOT_VALID_USER_BODY_ERR.code);
+               throw new ErrorHandler(errors.NOT_VALID_BODY.message, errors.NOT_VALID_BODY.code);
            }
 
            req.body = value;
@@ -78,7 +78,7 @@ module.exports = {
             const userById = await User.findById(user_id).lean();
 
             if (!userById) {
-               throw new ErrorHandler(errors.NOT_FOUND_ERR.message, errors.NOT_FOUND_ERR.code);
+               throw new ErrorHandler(errors.NOT_FOUND_USER_BY_ID.message, errors.NOT_FOUND_USER_BY_ID.code);
             }
 
             req.user = userById;
@@ -94,7 +94,7 @@ module.exports = {
             const {error, value} = userValidator.updateUserValidator.validate(req.body);
 
             if (error) {
-                throw new ErrorHandler(error.details[0].message);
+                throw new ErrorHandler(error.details[0].message, 400);
             }
 
             req.body = value;

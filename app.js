@@ -1,9 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
+const {ErrorHandler, errors} = require('./errors');
 
 const { MONGO_CONNECT_URL, PORT } = require('./configs/config');
-const errorStatus = 500;
 
 const app = express();
 
@@ -18,7 +18,7 @@ app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('*', (err, req, res, next) => {
 res
-    .status(err.status || errorStatus)
+    .status(err.status || ErrorHandler(errors.INTERNAL_SERVER_ERROR.code))
     .json({
     message: err.message
 })

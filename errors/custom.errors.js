@@ -14,9 +14,18 @@ module.exports = {
         code: 403
     },
 
-    NOT_VALID_USER_BODY_ERR: {
+    NOT_VALID_BODY: {
         message: 'Wrong email or password',
         code: 400
     },
 
+    NOT_FOUND_USER_BY_ID: {
+        message: 'User with this id does not exist',
+        code: 404
+    },
+
+    INTERNAL_SERVER_ERROR: {
+        message: 'The server cannot process the request to the site you are on',
+        code: 500
+    }
 }
