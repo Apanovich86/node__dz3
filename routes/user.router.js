@@ -28,6 +28,7 @@ router.put(
 );
 router.delete(
     '/:user_id',
+    userMiddleware.checkAccessToken,
     userMiddleware.checkUserById,
     userMiddleware.checkUserRoles([
         userRoles.ADMIN,
