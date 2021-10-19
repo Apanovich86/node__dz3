@@ -1,12 +1,11 @@
 const {userNormalizator} = require('../util/user.util');
-const O_Auth = require('../dataBase/O_Auth');
-const userUtil = require("../util/user.util");
-const tokenType = require("../configs/token-type");
-const { jwtService } = require("../service");
+const {O_Auth} = require('../dataBase');
+const userUtil = require('../util/user.util');
+const {jwtService} = require('../service');
 module.exports = {
     loginUser: async (req, res, next) => {
         try {
-            const {user} =req;
+            const {user} = req;
 
             const tokenPair = jwtService.generateTokenPair();
 
@@ -20,7 +19,7 @@ module.exports = {
             res.json({
                 user: userNormalized,
                 ...tokenPair
-        });
+            });
         } catch (e) {
             next(e);
         }
@@ -34,8 +33,8 @@ module.exports = {
 
             const newUser = userUtil.userNormalizator(user);
 
-           const refreshPair = await O_Auth.findByIdAndUpdate({user_id:newUser._id},
-            {...tokenPair});
+            const refreshPair = await O_Auth.findByIdAndUpdate({user_id: newUser._id},
+                {...tokenPair});
 
             res.json(refreshPair);
         } catch (e) {
@@ -45,14 +44,14 @@ module.exports = {
 
     logout: async (req, res, next) => {
         try {
-            const { user } = req;
+            const {user} = req;
 
             await O_Auth.deleteOne({user_id: user._id});
 
             res.json('You are logged out');
 
         } catch (error) {
-            next(error)
+            next(error);
         }
     },
 };

@@ -1,13 +1,11 @@
-const User = require('../dataBase/User');
-const {jwtService} = require("../service");
-const O_Auth = require('../dataBase/O_Auth')
+const {User, O_Auth} = require('../dataBase');
+const {jwtService} = require('../service');
 
 const {AUTHORIZATION} = require('../configs/constants');
 const tokenTypeEnum = require('../configs/token-type');
 const {ErrorHandler, errors} = require('../errors');
 const {compare} = require('../service/password.service');
-const {authValidator, userValidator} = require('../validators');
-const x =require('../dataBase/O_Auth');
+const {authValidator} = require('../validators');
 
 module.exports = {
     isAuthBodyValid: (req, res, next) => {
@@ -60,9 +58,9 @@ module.exports = {
         }
     },
 
-    isUserBodyValid: (req, res, next) => {
+    isUserBodyValid: (validator) => (req, res, next) => {
         try {
-            const { error, value } = userValidator.createUserValidator.validate(req.body);
+            const {error, value} = validator.validate(req.body);
 
             if (error) {
                 throw new ErrorHandler(errors.NOT_VALID_BODY.message, errors.NOT_VALID_BODY.code);
@@ -94,25 +92,9 @@ module.exports = {
         }
     },
 
-    isUpdateUserValid: (req, res, next) => {
-        try {
-            const {error, value} = userValidator.updateUserValidator.validate(req.body);
-
-            if (error) {
-                throw new ErrorHandler(error.details[0].message, 400);
-            }
-
-            req.body = value;
-
-            next();
-        } catch (e) {
-            next(e);
-        }
-    },
-
     checkUserRoles: (roleArr = []) => (req, res, next) => {
         try {
-            const { role } = req.user;
+            const {role} = req.user;
 
             if (!roleArr.includes(role)) {
                 throw new ErrorHandler(errors.FORBIDDEN_ERR.message, errors.FORBIDDEN_ERR.code);
@@ -134,13 +116,13 @@ module.exports = {
 
             await jwtService.verifyToken(token);
 
-           const tokenResponse = await O_Auth.findOne({access_token: token}).populate('user_id');
+            const tokenResponse = await O_Auth.findOne({access_token: token}).populate('user_id');
 
-          if (!tokenResponse) {
-              throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
-          }
+            if (!tokenResponse) {
+                throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
+            }
 
-           req.user = tokenResponse.user_id;
+            req.user = tokenResponse.user_id;
 
             next();
         } catch (e) {
@@ -156,7 +138,7 @@ module.exports = {
                 throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
             }
 
-           await jwtService.verifyToken(token, tokenTypeEnum.REFRESH);
+            await jwtService.verifyToken(token, tokenTypeEnum.REFRESH);
 
             const tokenResponse = await O_Auth.findOne({refresh_token: token}).populate('user_id');
 
@@ -164,7 +146,7 @@ module.exports = {
                 throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
             }
 
-            await O_Auth.remove({refresh_token: token });
+            await O_Auth.remove({refresh_token: token});
 
             req.user = tokenResponse.user_id;
 
