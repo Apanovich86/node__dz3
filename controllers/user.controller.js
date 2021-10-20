@@ -1,5 +1,6 @@
+const { WELCOME, UPDATE_USER, DELETE_USER } = require('../configs');
 const {User} = require('../dataBase');
-const passwordService = require('../service/password.service');
+const {passwordService, emailService} = require('../service');
 const userUtil = require('../util/user.util');
 
 module.exports = {
@@ -33,6 +34,8 @@ module.exports = {
 
             const newUser = await User.create({...req.body, password: hashedPassword});
 
+            await emailService.sendMail(req.body.email, WELCOME, { userName: req.body.name });
+
             const normUsers = userUtil.userNormalizator(newUser.toObject());
 
             res.json(normUsers);
@@ -48,6 +51,8 @@ module.exports = {
 
             const updateUser = await User.findByIdAndUpdate(user_id, {name}, {new: true});
 
+            await emailService.sendMail(req.body.email, UPDATE_USER, { userName: name });
+
             const normUsers = userUtil.userNormalizator(updateUser);
 
             res.json(normUsers);
@@ -60,6 +65,8 @@ module.exports = {
         try {
             const {user_id} = req.params;
             const delUser = await User.findByIdAndDelete(user_id);
+
+            await emailService.sendMail(req.body.email, DELETE_USER, { userName: name });
 
             const normUsers = userUtil.userNormalizator(delUser.toObject());
 
