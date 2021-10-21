@@ -1,6 +1,7 @@
 const EmailTemplates = require('email-templates');
 const nodemailer = require('nodemailer');
 const path = require('path');
+const {ErrorHandler, errors} = require('../errors');
 
 const { NO_REPLY_EMAIL, NO_REPLY_EMAIL_PASSWORD} = require('../configs/config');
 const allTemplates = require('../email-templates');
@@ -23,7 +24,7 @@ const sendMail = async (userMail, emailAction, context = {} ) => {
     const templateInfo = allTemplates[emailAction];
 
     if (!templateInfo) {
-        throw new Error('Wrong template name');
+        throw new ErrorHandler(errors.WRONG_TEMPLATE_NAME.message, errors.WRONG_TEMPLATE_NAME.code);;
     }
 
     const html = await templateParser.render(templateInfo.templateName, context);

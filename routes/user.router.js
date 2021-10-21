@@ -23,8 +23,8 @@ router.get(
 );
 router.put(
     '/:user_id',
-    userMiddleware.checkAccessToken,
     userMiddleware.isUserBodyValid(updateUserValidator),
+    userMiddleware.checkAccessToken,
     userMiddleware.checkUserById,
     userController.updateUser
 );

@@ -146,7 +146,7 @@ module.exports = {
                 throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
             }
 
-            await O_Auth.remove({refresh_token: token});
+            await O_Auth.deleteOne({refresh_token: token});
 
             req.user = tokenResponse.user_id;
 

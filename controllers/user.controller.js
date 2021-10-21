@@ -1,5 +1,5 @@
 const { WELCOME, UPDATE_USER, DELETE_USER } = require('../configs');
-const {User} = require('../dataBase');
+const {User, O_Auth} = require('../dataBase');
 const {passwordService, emailService} = require('../service');
 const userUtil = require('../util/user.util');
 
@@ -64,7 +64,9 @@ module.exports = {
     deleteUser: async (req, res, next) => {
         try {
             const {user_id} = req.params;
-            const delUser = await User.findByIdAndDelete(user_id);
+            const delUser = await User.deleteOne(user_id);
+
+            await O_Auth.deleteMany({user_id: user._id});
 
             await emailService.sendMail(req.body.email, DELETE_USER, { userName: name });
 

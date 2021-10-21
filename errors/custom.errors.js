@@ -29,5 +29,10 @@ module.exports = {
         code: 401
     },
 
+    WRONG_TEMPLATE_NAME: {
+        message: 'Wrong template name',
+        code: 400
+    },
+
     INTERNAL_SERVER_ERROR: 500
 };
