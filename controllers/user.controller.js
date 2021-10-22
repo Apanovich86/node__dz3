@@ -1,6 +1,6 @@
 const { WELCOME, UPDATE_USER, DELETE_USER } = require('../configs');
 const {User, O_Auth} = require('../dataBase');
-const {passwordService, emailService} = require('../service');
+const {emailService} = require('../service');
 const userUtil = require('../util/user.util');
 
 module.exports = {
@@ -20,6 +20,8 @@ module.exports = {
         try {
             const user = req.user;
 
+            User.testStatic(222);
+
             const normUsers = userUtil.userNormalizator(user);
 
             res.json(normUsers);
@@ -30,11 +32,13 @@ module.exports = {
 
     createUser: async (req, res, next) => {
         try {
-            const hashedPassword = await passwordService.hash(req.body.password);
+            // const hashedPassword = await passwordService.hash(req.body.password);
 
-            const newUser = await User.create({...req.body, password: hashedPassword});
+            const newUser = await User.createUserWithHashPassword(req.body);
 
-            await emailService.sendMail(req.body.email, WELCOME, { userName: req.body.name });
+            // const newUser = await User.create({...req.body, password: hashedPassword});
+
+            // await emailService.sendMail(req.body.email, WELCOME, { userName: req.body.name });
 
             const normUsers = userUtil.userNormalizator(newUser.toObject());
 
@@ -64,7 +68,7 @@ module.exports = {
     deleteUser: async (req, res, next) => {
         try {
             const {user_id} = req.params;
-            const delUser = await User.deleteOne(user_id);
+            const delUser = await User.deleteOne({ _id: user_id });
 
             await O_Auth.deleteMany({user_id: user._id});
 

@@ -34,5 +34,15 @@ module.exports = {
         code: 400
     },
 
+    USER_NOT_FOUND: {
+        message: 'User not found',
+        code: 404
+    },
+
+    WRONG_TOKEN_TYPE: {
+        message: 'Wrong token type',
+        code: 500
+    },
+
     INTERNAL_SERVER_ERROR: 500
 };

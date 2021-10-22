@@ -1,11 +1,20 @@
 const {userNormalizator} = require('../util/user.util');
-const {O_Auth} = require('../dataBase');
+const {O_Auth, User} = require('../dataBase');
 const userUtil = require('../util/user.util');
-const {jwtService} = require('../service');
+const {ErrorHandler, errors } = require('../errors/ErrorHandler');
+const {jwtService, emailService, passwordService} = require('../service');
+const ActionToken = require('../dataBase/ActionToken');
+const ActionTokenTypeEnum = require('../configs/action-token-type.enum');
+const EmailActionEnum = require('../configs/email-action.enum');
+const {AUTHORIZATION} = require('../configs/constants');
+const {URL_FROM_FRONT_END, PASSWORD_FORGOT_URL, NEW_PASSWORD} = require('../configs');
+
 module.exports = {
     loginUser: async (req, res, next) => {
         try {
             const {user} = req;
+
+            await user.comparePassword(req.body.password);
 
             const tokenPair = jwtService.generateTokenPair();
 
@@ -49,6 +58,62 @@ module.exports = {
             await O_Auth.deleteOne({user_id: user._id});
 
             res.json('You are logged out');
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    sendMailForgotPassword: async (req, res, next) => {
+        try {
+            const { email } = req.body;
+
+            const user = await User.findOne({ email });
+
+            if(!user) {
+                throw new ErrorHandler(errors.USER_NOT_FOUND.message, errors.USER_NOT_FOUND.code);
+            }
+
+            const actionToken = jwtService.generateActionToken(ActionTokenTypeEnum.FORGOT_PASSWORD);
+
+            await ActionToken.create({
+                token: actionToken,
+                token_type: ActionTokenTypeEnum.FORGOT_PASSWORD,
+                user_id: user._id
+            });
+
+            await emailService.sendMail(email, EmailActionEnum.FORGOT_PASSWORD,
+                {forgotPasswordUrl: URL_FROM_FRONT_END + PASSWORD_FORGOT_URL + '?token=' + actionToken});
+
+            res.json('Ok');
+
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    setNewPasswordAfterForgot: async (req, res, next) => {
+        try {
+            const {password} = req.body;
+            const {_id, email, name} = req.user;
+
+            const actionToken = req.get(AUTHORIZATION);
+
+            if (!actionToken) {
+                throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
+            }
+
+            await jwtService.verifyToken(actionToken);
+
+            const hashedPassword = await passwordService.hash(password);
+
+            await User.findByIdAndUpdate(_id, { password: hashedPassword });
+
+            await emailService.sendMail(email, NEW_PASSWORD, { userName: name, password });
+
+            await O_Auth.deleteMany({ user_id: _id });
+
+            res.json('Good');
 
         } catch (error) {
             next(error);

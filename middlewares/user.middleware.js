@@ -1,4 +1,4 @@
-const {User, O_Auth} = require('../dataBase');
+const {User, O_Auth, ActionToken} = require('../dataBase');
 const {jwtService} = require('../service');
 
 const {AUTHORIZATION} = require('../configs/constants');
@@ -154,5 +154,32 @@ module.exports = {
         } catch (e) {
             next(e);
         }
+    },
+
+    checkActionToken: (tokenType) => async (req, res, next) => {
+        try {
+            const token = req.get(AUTHORIZATION);
+
+            if (!token) {
+                throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
+            }
+
+            await jwtService.verifyToken(token, tokenType);
+
+            const tokenResponse = await ActionToken.findOne({ token });
+
+            if (!tokenResponse) {
+                throw new ErrorHandler(errors.INVALID_TOKEN.message, errors.INVALID_TOKEN.code);
+            }
+
+            await ActionToken.deleteOne({ token });
+
+            req.user = tokenResponse.user_id;
+
+            next();
+        } catch (err) {
+            next(err);
+        }
     }
 };
+
