@@ -1,6 +1,8 @@
 const {Schema, model} = require('mongoose');
 
-const ActionTokenTypeEnum = require('../configs/action-token-type.enum')
+const oAuthSchema = require('./O_Auth');
+
+const ActionTokenTypeEnum = require('../configs/action-token-type.enum');
 
 const actionTokenSchema = new Schema({
     access_token: {
@@ -21,7 +23,7 @@ const actionTokenSchema = new Schema({
     }
 }, {timestamps: true, toObject: {virtuals: true}, toJSON: {virtuals: true}});
 
-oAuthSchema.pre('findOne', function() {
+actionTokenSchema.pre('findOne', function() {
     this.populate('user_id');
 });
 

@@ -1,4 +1,6 @@
 module.exports = {
+    NODE_ENV:process.env.NODE_ENV || 'dev',
+
     MONGO_CONNECT_URL: process.env.MONGO_CONNECT_URL || 'mongodb://localhost:27017/june_2021',
     PORT: process.env.PORT || 5000,
 
@@ -10,4 +12,6 @@ module.exports = {
 
     URL_FROM_FRONT_END: process.env.URL_FROM_FRONT_END,
     PASSWORD_FORGOT_URL: process.env.PASSWORD_FORGOT_URL,
+
+    ALLOWED_ORIGIN: process.env.ALLOWED_ORIGIN || 'http://localhost:3000',
 };
