@@ -11,7 +11,7 @@ const {INTERNAL_SERVER_ERROR} = require('./errors');
 const {ALLOWED_ORIGIN, MONGO_CONNECT_URL, PORT, NODE_ENV, CORS_NOT_ALLOWED} = require('./configs');
 const startCron = require('./cron');
 const ErrorHandler = require('./errors/ErrorHandler');
-const checkDefaultData = require('./util');
+const {checkDefaultData} = require('./util');
 
 const app = express();
 
