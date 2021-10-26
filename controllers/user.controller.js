@@ -48,7 +48,7 @@ module.exports = {
 
             const updateUser = await User.findByIdAndUpdate(user_id, {name}, {new: true});
 
-            const normUsers = userUtil.userNormalizator(updateUser);
+            const normUsers = userUtil.userNormalizator(updateUser.toObject());
 
             res.json(normUsers);
         } catch (e) {
